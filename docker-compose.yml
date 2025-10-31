@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: db-container
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: test_db
+    networks:
+      - app-net
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test_user -d postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: desafio-vertical-logistica
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: test_user
+      DATABASE_PASSWORD: test_pass
+      DATABASE_NAME: test_db
+      NODE_ENV: local
+    command: npm run start:dev
+    networks:
+      - app-net
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  app-test:
+    build: .
+    container_name: desafio-vertical-logistica-test
+    restart: 'no'
+    env_file:
+      - .env.test
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: test_user
+      DATABASE_PASSWORD: test_pass
+      DATABASE_NAME: test_db_test
+      NODE_ENV: test
+    command: sh -c "export PGPASSWORD=test_pass && psql -h db -U test_user -d postgres -c 'CREATE DATABASE test_db_test;' || true && npm run typeorm:test schema:drop && npm run typeorm:test migration:run && npm run test:e2e"
+    networks:
+      - app-net
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local
