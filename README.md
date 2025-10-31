@@ -6,7 +6,9 @@ Para este projeto utilizei
 [NestJS](https://github.com/nestjs/nest) framework por sua relação com o desafio, mas ressalto que outros poderiam ser igualmente usados com sucesso, por exemplo [Fastify](https://fastify.dev/), [Express](https://expressjs.com/), entre outros. O NestJS permite o uso de vários tipos de arquitetura e padrões de projetos. Como uma das solicitações para esse desafio foi simplicidade escolhi a arquitetura Modular (ou de Módulos). A mesma funciona muito bem para diferentes tamanhos de projetos pois permite criar aplicações com baixo acoplamento, e é muito relacionada a própria estrutura do framework.
 
 #
+
 ### Desenho Arquitetura
+
 ![Arquitetura Simplificada](./assets/arquitetura-simplificada.png)
 
 #
@@ -38,7 +40,8 @@ O projeto está utiliza o swagger sendo possível após a configuração do proj
 Com o docker instalado execute ([Instalação Docker](https://docs.docker.com/engine/install)):
 
 ```bash
-$ docker compose up -d
+# Na pasta do projeto execute:
+$ npm i && docker compose up -d
 ```
 
 ## Após estar com os containers sendo executados corretamente
